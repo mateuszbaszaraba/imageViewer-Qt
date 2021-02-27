@@ -3,6 +3,12 @@
 #include <QScrollArea>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QImageReader>
+#include <QImageWriter>
+#include <QMessageBox>
+#include <QAction>
 
 ImageViewer::ImageViewer(QWidget *parent)
     : QMainWindow(parent), imageLabel(new QLabel)
@@ -21,6 +27,61 @@ ImageViewer::ImageViewer(QWidget *parent)
 
     resize(QGuiApplication::primaryScreen()->availableSize() *3/5);
 }
+
+static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMode acceptMode)
+{
+    static bool firstDialog = true;
+
+    if (firstDialog) {
+        firstDialog = false;
+        const QStringList picturesLocations = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
+        dialog.setDirectory(picturesLocations.isEmpty() ? QDir::currentPath() : picturesLocations.last());
+    }
+
+    QStringList mimeTypeFilters;
+    const QByteArrayList supportedMimeTypes = acceptMode == QFileDialog::AcceptOpen
+        ? QImageReader::supportedMimeTypes() : QImageWriter::supportedMimeTypes();
+    for (const QByteArray &mimeTypeName : supportedMimeTypes)
+        mimeTypeFilters.append(mimeTypeName);
+    mimeTypeFilters.sort();
+    dialog.setMimeTypeFilters(mimeTypeFilters);
+    dialog.selectMimeTypeFilter("image/jpeg");
+    if (acceptMode == QFileDialog::AcceptSave)
+        dialog.setDefaultSuffix("jpg");
+}
+
+void ImageViewer::open()
+{
+    QFileDialog dialog(this, tr("Open file"));
+    initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
+
+    while(dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
