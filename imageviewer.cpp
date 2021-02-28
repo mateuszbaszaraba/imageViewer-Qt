@@ -58,8 +58,27 @@ void ImageViewer::open()
     while(dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
 }
 
+bool ImageViewer::loadFile(const QString &fileName)
+{
+    QImageReader reader(fileName);
+    reader.setAutoTransform(true);
+    const QImage newImage = reader.read();
+    if (newImage.isNull()) {
+        QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
+                                 tr("Cannot load %1: %2")
+                                 .arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+        return false;
+    }
+    scaleFactor = 1.0;
 
+    scrollArea->setVisible(true);
+    printAct->setEnabled(true);
+    fitToWindowAct->setEnabled(true);
+    updateActions();
 
+    if (!fitToWindowAct->isChecked())
+        imageLabel->adjustSize();
+}
 
 
 
