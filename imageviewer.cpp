@@ -80,7 +80,30 @@ bool ImageViewer::loadFile(const QString &fileName)
         imageLabel->adjustSize();
 }
 
+void ImageViewer::zoomIn()
+{
+    scaleImage(1.25);
+}
 
+void ImageViewer::zoomOut()
+{
+    scaleImage(0.8);
+}
+
+void ImageViewer::normalSize()
+{
+    imageLabel->adjustSize();
+    scaleFactor = 1.0;
+}
+
+void ImageViewer::fitToWindow()
+{
+    bool fitToWindow = fitToWindowAct->isChecked();
+    scrollArea->setWidgetResizable(fitToWindow);
+    if (!fitToWindow)
+        normalSize();
+    updateActions();
+}
 
 
 
